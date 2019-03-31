@@ -15,9 +15,12 @@ bot.once('ready', () => {
 bot.on('message', (message) => {
     if (!message.content.startsWith(config.prefix) || message.author.bot) return;
 
-    // bug not split correctly
-    const args = message.content.slice(config.prefix.length).split(' ');
+    // take the prefix and split it
+    const args = message.content.slice(config.prefix.length).split(/ +/);
+    // take the first element and split the rest into the args array
     const command = args.shift().toLowerCase();
+
+    // testing the contents being read
     message.channel.send(`Command name: ${command}\nArguments: ${args}`);
 
     // if (args.length == 0) {
