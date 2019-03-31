@@ -13,12 +13,33 @@ bot.once('ready', () => {
 
 // simple bot command
 bot.on('message', (message) => {
-    if (message.content == 'test') {
-        // will send with @
-        message.reply('ok');
-        // send message only without @
-        message.channel.send('ok no @');
+    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+
+    // bug not split correctly
+    const args = message.content.slice(config.prefix.length).split(' ');
+    const command = args.shift().toLowerCase();
+    message.channel.send(`Command name: ${command}\nArguments: ${args}`);
+
+    // if (args.length == 0) {
+    //     return message.channel.send(`Hey ${message.author}!, you didn't type any arguments`);
+    // }
+
+    switch(command) {
+        case `test`:
+            message.channel.send("command sent is test");
+            break;
+        
+        case `stop`:
+            message.channel.send("command sent is stop");
+            break;
+        
+        default:
+            message.channel.send("Command not recognised");
+            break;
     }
 });
+
+
+
 
 bot.login(config.token);
