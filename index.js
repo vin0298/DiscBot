@@ -4,10 +4,17 @@ const Discord = require('discord.js');
 const bot = new Discord.Client();
 // 66156848 - permission
 
+bot.once('ready', () => {
+	console.log('Ready!');
+});
+
 // simple bot command
-client.on('message', (message) => {
+bot.on('message', (message) => {
     if (message.content == 'test') {
+        // will send with @
         message.reply('ok');
+        // send message only without @
+        message.channel.sendMessage('ok no @');
     }
 });
 
