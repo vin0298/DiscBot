@@ -31,25 +31,24 @@ bot.on('message', (message) => {
     // take the prefix and split it
     const args = message.content.slice(config.prefix.length).split(/ +/);
     // take the first element and split the rest into the args array
-    const command = args.shift().toLowerCase();
+    const commandName = args.shift().toLowerCase();
 
-    message.channel.send(`Command name: ${command}\nArguments: ${args}`);
+    message.channel.send(`Command name: ${commandName}\nArguments: ${args}`);
 
     // Command not recognised
-    if(!bot.commands.has(command)) {
+    if(!bot.commands.has(commandName)) {
         message.channel.send("Command not recognised");
         return;
     }    
 
+    const commandToExec = bot.commands.get(commandName);
+
     try {
-        bot.commands.get(command).execute(message, args);
+        commandToExec.execute(message, args);
     } catch(error) {
         console.error(error);
         message.channel.send("Command fails to be executed");
     }
 });
-
-
-
 
 bot.login(config.token);
