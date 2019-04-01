@@ -14,10 +14,11 @@ module.exports = {
             helpMessageToSend.push(commands.map(command => command.name).join(', '));
             helpMessageToSend.push(`\nUse \`${prefix}help [command name]\` to get info on a specific command`);
 
+            // split: true - split to two messages if it's too long
             return message.author.send(helpMessageToSend, { split: true })
 	            .then(() => {
 		            if (message.channel.type === 'dm') return;
-		            message.reply('A DM with all my commands!');
+		            message.reply('Sent you a DM with all my commands!');
 	            })
 	            .catch(error => {
 		            console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
