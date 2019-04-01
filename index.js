@@ -1,14 +1,17 @@
 // import discord library
 const Discord = require('discord.js');
-// creates the client
-const bot = new Discord.Client();
-// 66156848 - permission
-
+// javascript's filesystem
+const fs = require('fs');
 // Import the constants(private)
 const config = require('./config.json');
 
+// creates the bot client
+const bot = new Discord.Client();
+// Creates collection (or map) to hold the bot's commands
+bot.commands = new Discord.Client();
+
 bot.once('ready', () => {
-	console.log('Ready!');
+	console.log('Bot is Ready and Online!');
 });
 
 // simple bot command
