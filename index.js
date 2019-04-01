@@ -69,7 +69,7 @@ bot.on('message', (message) => {
 
         if (timeNow < cooldownExpirationTime) {
             const timeLeft = (cooldownExpirationTime - timeNow) / 1000;
-            return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${commandToExec.name}\` command.`);
+            return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${commandToExec.name}\` command.`);
         }
     }
 
@@ -82,7 +82,7 @@ bot.on('message', (message) => {
         commandToExec.execute(message, args);
     } catch(error) {
         console.error(error);
-        message.channel.send("Command fails to be executed");
+        message.channel.send(`\`COMMAND FAILS TO BE EXECUTED\``);
     }
 });
 
