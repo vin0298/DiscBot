@@ -8,7 +8,17 @@ const config = require('./config.json');
 // creates the bot client
 const bot = new Discord.Client();
 // Creates collection (or map) to hold the bot's commands
-bot.commands = new Discord.Client();
+bot.commands = new Discord.Collection();
+
+// Extract the command files and put it into an array
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+// Add the commands to the Collection or map
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+
+    bot.commands.set(command.name, command);
+}
 
 bot.once('ready', () => {
 	console.log('Bot is Ready and Online!');
@@ -23,25 +33,19 @@ bot.on('message', (message) => {
     // take the first element and split the rest into the args array
     const command = args.shift().toLowerCase();
 
-    // testing the contents being read
     message.channel.send(`Command name: ${command}\nArguments: ${args}`);
 
-    // if (args.length == 0) {
-    //     return message.channel.send(`Hey ${message.author}!, you didn't type any arguments`);
-    // }
+    // Command not recognised
+    if(!bot.commands.has(command)) {
+        message.channel.send("Command not recognised");
+        return;
+    }    
 
-    switch(command) {
-        case `test`:
-            message.channel.send("command sent is test");
-            break;
-        
-        case `stop`:
-            message.channel.send("command sent is stop");
-            break;
-        
-        default:
-            message.channel.send("Command not recognised");
-            break;
+    try {
+        bot.commands.get(command).execute(message, args);
+    } catch(error) {
+        console.error(error);
+        message.channel.send("Command fails to be executed");
     }
 });
 
