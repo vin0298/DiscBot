@@ -43,6 +43,10 @@ bot.on('message', (message) => {
 
     const commandToExec = bot.commands.get(commandName);
 
+    if (commandToExec.args && !args.length) {
+        return message.channel.send("No arguments provided");
+    }
+
     try {
         commandToExec.execute(message, args);
     } catch(error) {

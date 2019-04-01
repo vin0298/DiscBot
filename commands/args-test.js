@@ -1,11 +1,8 @@
 module.exports = {
 	name: 'args-test',
-	description: 'Argument parsing testing!',
+    description: 'Argument parsing testing!',
+    args: true,
 	execute(message, args) {
-        if(args.length == 0) {
-            return message.channel.send("No arguments found");
-        }
-
 		message.channel.send(`The first argument is: ${args[0]}`);
 	},
 };
