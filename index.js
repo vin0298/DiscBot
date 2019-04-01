@@ -77,7 +77,7 @@ bot.on('message', (message) => {
     commandTimestamps.set(message.author.id, timeNow);
     setTimeout(() => commandTimestamps.delete(message.author.id), cooldownTime);
 
-
+    // Executes the command and returns and error message if it fails
     try {
         commandToExec.execute(message, args);
     } catch(error) {
