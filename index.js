@@ -44,7 +44,12 @@ bot.on('message', (message) => {
     const commandToExec = bot.commands.get(commandName);
 
     if (commandToExec.args && !args.length) {
-        return message.channel.send("No arguments provided");
+        let wrongArgsReply = "No arguments provided. "
+        if (commandToExec.usage) {
+            wrongArgsReply += `\n The proper usage would be: \ "${config.prefix}${commandToExec.name} ${commandToExec.usage} \"`;
+        }
+
+        return message.channel.send(wrongArgsReply);
     }
 
     try {
