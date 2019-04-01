@@ -10,6 +10,9 @@ const bot = new Discord.Client();
 // Creates collection (or map) to hold the bot's commands
 bot.commands = new Discord.Collection();
 
+// Variable for cooldown commands
+const cooldowns = new Discord.Collection();
+
 // Extract the command files and put it into an array
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -51,6 +54,29 @@ bot.on('message', (message) => {
 
         return message.channel.send(wrongArgsReply);
     }
+
+    // Cooldown command execution
+    if (!cooldowns.has(commandToExec.name)) {
+        cooldowns.set(commandToExec.name, new Discord.Collection());
+    }
+
+    const timeNow = Date.now();
+    const commandTimestamps = cooldowns.get(commandToExec.name);
+    const cooldownTime = (commandToExec.cooldown || 3) * 1000;
+
+    if (commandTimestamps.has(message.author.id)) {
+        const cooldownExpirationTime = commandTimestamps.get(message.author.id) + cooldownTime;
+
+        if (timeNow < cooldownExpirationTime) {
+            const timeLeft = (cooldownExpirationTime - timeNow) / 1000;
+            return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${commandToExec.name}\` command.`);
+        }
+    }
+
+    // Manage the timestamps - delete the author id if past the cooldown time
+    commandTimestamps.set(message.author.id, timeNow);
+    setTimeout(() => commandTimestamps.delete(message.author.id), cooldownTime);
+
 
     try {
         commandToExec.execute(message, args);
