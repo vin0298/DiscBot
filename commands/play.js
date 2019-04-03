@@ -17,15 +17,15 @@ module.exports = {
 
         // Parse the link
         url = args[0];
-        message.channel.send(url); // URL Parsing test
+        // message.channel.send(url); // URL Parsing test
 
         // Check if link is valid
-        ytdl.getInfo(url, function(err, info) {
-            if (err) {
-                return message.reply(`Invalid URL. Please retry with a valid URL`);
-            }
-        });
+        let validation = ytdl.validateURL(url);
+        if (!validation) {
+            return message.reply(`Invalid URL. Please retry with a valid URL`);
+        }
 
+        // IMPLEMENT PLAYLIST
         const voiceChannel = message.member.voiceChannel;
         voiceChannel.join()
             .then(connection => {
@@ -35,7 +35,9 @@ module.exports = {
                 const dispatcher = connection.playStream(musicStream);
                 dispatcher.on("end", end => {
                     message.channel.send('Music ended, left voice channel');
-                    voiceChannel.leave();
+                    setTimeout(function(){
+                        voiceChannel.leave()
+                    }, 1000)
                 })
             })
 	},
