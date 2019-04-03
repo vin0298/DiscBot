@@ -10,9 +10,11 @@ module.exports = {
         const {commands} = message.client;
 
         if (!args.length) {
+            helpMessageToSend.push('```');
             helpMessageToSend.push('List of all available commands:\n');
             helpMessageToSend.push(commands.map(command => command.name).join(', '));
             helpMessageToSend.push(`\nUse \`${prefix}help [command name]\` to get info on a specific command`);
+            helpMessageToSend.push('```');
 
             // split: true - split to two messages if it's too long
             return message.author.send(helpMessageToSend, { split: true })
@@ -32,17 +34,19 @@ module.exports = {
 	            return message.reply(`The command requested is not a valid command! Use \` ${prefix}help \` to see all available commands`);
             }
 
-            helpMessageToSend.push(` \`Command Name: ${command.name} \``);
+            helpMessageToSend.push('```');
+            helpMessageToSend.push(`Command Name: ${command.name}`);
 
             if (command.description) {
-                helpMessageToSend.push(`\`Description: ${command.description} \``);
+                helpMessageToSend.push(`Description: ${command.description}`);
             }
             
             if (command.usage) {
-                helpMessageToSend.push(`\` Usage: ${prefix}${command.name} ${command.usage} \``);
+                helpMessageToSend.push(`Usage: ${prefix}${command.name} ${command.usage}`);
             }
 
-            helpMessageToSend.push(`\` Cooldown: ${command.cooldown || 3} second(s) \``);
+            helpMessageToSend.push('Cooldown: ${command.cooldown || 3} second(s)');
+            helpMessageToSend.push('```');
 
             message.channel.send(helpMessageToSend, { split: true });
         }

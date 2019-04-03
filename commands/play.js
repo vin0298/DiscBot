@@ -3,7 +3,7 @@ const ytdl = require("ytdl-core");
 module.exports = {
 	name: 'play',
     description: 'Command to play music',
-    usage: `\`music-url\``,
+    usage: `"music-url"`,
     args: true,
 	execute(message, args) {
         // Check if user already join the voice channel
@@ -30,14 +30,15 @@ module.exports = {
             .then(connection => {
                 message.channel.send("Successfully joined voice channel");
 
-                const musicStream = ytdl(url);
+                // HIGH WATERMARK OPTION
+                const musicStream = ytdl(url, {highWaterMark: 25});
                 const dispatcher = connection.playStream(musicStream);
                 dispatcher.on("end", end => {
                     setTimeout(function(){
                         console.log("Ending log: " + end);
                         message.channel.send('Music ended, left voice channel');
                         voiceChannel.leave()
-                    }, 10)
+                    }, 10000)
                 })
                 .on("error", error => {
                     console.error(error);
