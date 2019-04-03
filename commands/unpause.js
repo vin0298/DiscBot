@@ -1,7 +1,7 @@
 module.exports = {
-	name: 'pause',
-    description: 'Command to pause the music that is currently playing',
-	execute(message) {
+	name: 'unpause',
+    description: 'Command to unpause the currently paused music and continue playing it',
+	async execute(message) {
         if (!message.member.voiceChannel) {
             return message.channel.send(`You need to be in a voice channel to use this command`);
         }
@@ -12,15 +12,15 @@ module.exports = {
             if (!curServer.dispatcher) {
                 return message.channel.send('No music currently in play');
             } else {
-                if (curServer.dispatcher.paused) {
-                    return message.channel.send('Music is already paused');
+                if (!curServer.dispatcher.paused) {
+                    return message.channel.send('Music is not paused');
                 } else {
-                    curServer.dispatcher.pause();
-                    return message.channel.send('Music is being paused');
+                    await curServer.dispatcher.resume();
+                    return message.channel.send('Music is unpaused');
                 }
             }
         } else {
-            return message.channel.send('Bot not in a voice channel - nothing to pause');
+            return message.channel.send('Bot not in a voice channel - nothing to unpause');
         }
 	},
 };
