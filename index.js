@@ -36,7 +36,7 @@ bot.on('message', (message) => {
     // take the first element and split the rest into the args array
     const commandName = args.shift().toLowerCase();
 
-    message.channel.send(`Command name: ${commandName}\nArguments: ${args}`);
+    // message.channel.send(`Command name: ${commandName}\nArguments: ${args}`);
 
     // Command not recognised
     if(!bot.commands.has(commandName)) {

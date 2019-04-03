@@ -17,7 +17,6 @@ module.exports = {
 
         // Parse the link
         url = args[0];
-        // message.channel.send(url); // URL Parsing test
 
         // Check if link is valid
         let validation = ytdl.validateURL(url);
@@ -25,20 +24,25 @@ module.exports = {
             return message.reply(`Invalid URL. Please retry with a valid URL`);
         }
 
-        // IMPLEMENT PLAYLIST
+        // TODO: IMPLEMENT PLAYLIST QUEUE | IMPLEMENT SEARCH | DYNAMIC PREFIX
         const voiceChannel = message.member.voiceChannel;
         voiceChannel.join()
             .then(connection => {
                 message.channel.send("Successfully joined voice channel");
 
-                const musicStream = ytdl(url, {filter: 'audioonly'});
+                const musicStream = ytdl(url);
                 const dispatcher = connection.playStream(musicStream);
                 dispatcher.on("end", end => {
-                    message.channel.send('Music ended, left voice channel');
                     setTimeout(function(){
+                        console.log("Ending log: " + end);
+                        message.channel.send('Music ended, left voice channel');
                         voiceChannel.leave()
-                    }, 1000)
+                    }, 10)
                 })
+                .on("error", error => {
+                    console.error(error);
+                    message.channel.send("Error Occurred during playback. Try again later.");
+                });
             })
 	},
 };
