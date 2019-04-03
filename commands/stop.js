@@ -5,11 +5,12 @@ module.exports = {
     description: 'Command to stop playing music',
     usage: `\`${prefix}stop\``,
 	execute(message) {
-        // Check if user already join the voice channel
-        // if (!message.member.voiceChannel) {
-        //     return message.channel.send(`You need to be in a voice channel`);
-        // }
-        // Check link
+        if (message.guild.voiceConnection) {
+            // Empty the queue
+            let em = [];
+            servers[message.guild.id] = em;
+        }
+
         message.member.voiceChannel.leave();
 	},
 };
