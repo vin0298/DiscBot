@@ -24,7 +24,7 @@ module.exports = {
             return message.reply(`Invalid URL. Please retry with a valid URL`);
         }
 
-        // TODO: IMPLEMENT PLAYLIST QUEUE | IMPLEMENT SEARCH | DYNAMIC PREFIX
+        // TODO: IMPLEMENT PLAYLIST QUEUE | IMPLEMENT SEARCH | DYNAMIC PREFIX | SKIP | PAUSE | QUEUE
         const voiceChannel = message.member.voiceChannel;
         voiceChannel.join()
             .then(connection => {
@@ -38,7 +38,7 @@ module.exports = {
                         console.log("Ending log: " + end);
                         message.channel.send('Music ended, left voice channel');
                         voiceChannel.leave()
-                    }, 10000)
+                    }, 100000)
                 })
                 .on("error", error => {
                     console.error(error);
