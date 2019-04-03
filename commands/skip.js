@@ -1,5 +1,3 @@
-const {prefix} = require('../config.json');
-
 module.exports = {
 	name: 'skip',
     description: 'Command to skip and start playing the next music',
