@@ -16,6 +16,8 @@ const cooldowns = new Discord.Collection();
 // Extract the command files and put it into an array
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+global.servers = {};
+
 // Add the commands to the Collection or map
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -72,7 +74,7 @@ bot.on('message', (message) => {
             return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${commandToExec.name}\` command.`);
         }
     }
-
+    
     // Manage the timestamps - delete the author id if past the cooldown time
     commandTimestamps.set(message.author.id, timeNow);
     setTimeout(() => commandTimestamps.delete(message.author.id), cooldownTime);
