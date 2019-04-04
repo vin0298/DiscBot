@@ -44,17 +44,12 @@ module.exports = {
         // Parse the link
         url = args[0];
 
-        // Check if link is valid
-        // let validation = ytdl.validateURL(url);
-        // if (!validation) {
-        //     return message.reply(`Invalid URL. Please retry with a valid URL`);
-        // }
         ytdl.getInfo(url, function(err, info) {
             if (err) {
               return message.channel.send(`Invalid URL`);
             }
             
-            message.channel.send(`Playing: ${info.title}`);
+            message.channel.send(`Playing: **${info.title}**`);
         })
     
 
