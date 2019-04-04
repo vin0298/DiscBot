@@ -88,4 +88,9 @@ bot.on('message', (message) => {
     }
 });
 
+bot.on("error", error => {
+    console.error(error);
+    message.channel.send("Bot encountered an error.");
+});
+
 bot.login(config.token);

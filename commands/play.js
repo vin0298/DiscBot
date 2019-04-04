@@ -1,5 +1,7 @@
 const ytdl = require("ytdl-core");
 
+// ADD A RESPONSE WHEN QUEUEING MUSIC
+
 function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
     const musicStream = ytdl(server.queue[0], {highWaterMark: 25});
@@ -26,7 +28,7 @@ function PlayMusic(connection, message) {
 
 module.exports = {
 	name: 'play',
-    description: 'Command to play music',
+    description: 'Command to play music. If play is used music is playing then the music being requested will be queued',
     usage: `"music-url"`,
     args: true,
 	execute(message, args) {
@@ -43,10 +45,18 @@ module.exports = {
         url = args[0];
 
         // Check if link is valid
-        let validation = ytdl.validateURL(url);
-        if (!validation) {
-            return message.reply(`Invalid URL. Please retry with a valid URL`);
-        }
+        // let validation = ytdl.validateURL(url);
+        // if (!validation) {
+        //     return message.reply(`Invalid URL. Please retry with a valid URL`);
+        // }
+        ytdl.getInfo(url, function(err, info) {
+            if (err) {
+              return message.channel.send(`Invalid URL`);
+            }
+            
+            message.channel.send(`Playing: ${info.title}`);
+        })
+    
 
         if (!servers[message.guild.id]) {
             // Check if there exist a queue
