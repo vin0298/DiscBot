@@ -17,6 +17,7 @@ const cooldowns = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 global.servers = new Map();
+global.prefixForServers = new Map();
 
 // Add the commands to the Collection or map
 for (const file of commandFiles) {
@@ -31,10 +32,15 @@ bot.once('ready', () => {
 
 // simple bot command
 bot.on('message', (message) => {
-    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+    var serverPrefix = config.prefix;
+    if (prefixForServers[message.guild.id]) {
+        serverPrefix = prefixForServers[message.guild.id];
+    }
+
+    if (!message.content.startsWith(serverPrefix) || message.author.bot) return;
 
     // take the prefix and split it
-    const args = message.content.slice(config.prefix.length).split(/ +/);
+    const args = message.content.slice(serverPrefix.length).split(/ +/);
     // take the first element and split the rest into the args array
     const commandName = args.shift().toLowerCase();
 
@@ -51,7 +57,7 @@ bot.on('message', (message) => {
     if (commandToExec.args && !args.length) {
         let wrongArgsReply = "No arguments provided. "
         if (commandToExec.usage) {
-            wrongArgsReply += `\n The proper usage would be: \ "${config.prefix}${commandToExec.name} ${commandToExec.usage} \"`;
+            wrongArgsReply += `\n The proper usage would be: \ "${serverPrefix}${commandToExec.name} ${commandToExec.usage} \"`;
         }
 
         return message.channel.send(wrongArgsReply);
@@ -84,13 +90,13 @@ bot.on('message', (message) => {
         commandToExec.execute(message, args);
     } catch(error) {
         console.error(error);
-        message.channel.send(`\`COMMAND FAILS TO BE EXECUTED\``);
+        message.channel.send('```COMMAND FAILS TO BE EXECUTED```');
     }
 });
 
 bot.on("error", error => {
     console.error(error);
-    message.channel.send("Bot encountered an error.");
+    message.channel.send('```Bot encountered an error.```');
 });
 
 bot.login(config.token);

@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'join',
     description: 'Command to join a voice channel',
-    usage: `\`join\``,
+    usage: `No arguments / URL`,
 	execute(message) {
         // Check if user already join the voice channel
         if (!message.member.voiceChannel) {
