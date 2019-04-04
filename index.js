@@ -16,7 +16,7 @@ const cooldowns = new Discord.Collection();
 // Extract the command files and put it into an array
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-global.servers = {};
+global.servers = new Map();
 
 // Add the commands to the Collection or map
 for (const file of commandFiles) {
