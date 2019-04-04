@@ -5,10 +5,15 @@ module.exports = {
 	execute(message) {
         // Check if user already join the voice channel
         if (message.guild.voiceConnection) {
-            message.guild.voiceConnection.disconnect();
-            return message.reply("Successfully left voice channel");
+            // Empty the queue
+            if (servers[message.guild.id].dispatcher) {
+                servers[message.guild.id].dispatcher.destroy();
+            }
+            servers[message.guild.id] = {queue: []};
+            servers.delete(message.guild.id);
+            message.member.voiceChannel.leave();
+        } else {
+            return message.channel.send("You need to be in a voice channel to be able to use this command");
         }
-        // Check link
-        message.reply("Bot is not in a voice channel");
 	},
 };
