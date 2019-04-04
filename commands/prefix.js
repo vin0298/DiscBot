@@ -14,14 +14,14 @@ module.exports = {
         } 
         
         if (newPrefix === prefixForServers[message.guild.id]) {
-            return message.channel.reply(`New prefix suggested is the same as old prefix: ${newPrefix}`);
+            return message.channel.send(`New prefix suggested is the same as old prefix: ${newPrefix}`);
         } else if (newPrefix === 'default') {
             prefixForServers[message.guild.id] = prefix;
-            return message.channel.reply(`Prefix is set to default: ${prefix}`);
+            return message.channel.send(`Prefix is set to default: ${prefix}`);
         } else {
             prefixForServers[message.guild.id] = newPrefix;
         }
 
-        return message.channel.reply(`Prefix set for this channel is set to ${newPrefix}`);
+        return message.channel.send(`Prefix set for this channel is set to ${newPrefix}`);
 	},
 };

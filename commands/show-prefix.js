@@ -10,6 +10,6 @@ module.exports = {
             prefixToShow = prefixForServers[message.guild.id];
         }
 
-        return message.channel.reply(`Prefix set for this channel is ${prefixToShow}`);
+        return message.channel.send(`Prefix set for this channel is ${prefixToShow}`);
 	},
 };
