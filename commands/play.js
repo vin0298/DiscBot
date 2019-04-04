@@ -4,7 +4,7 @@ const ytdl = require("ytdl-core");
 
 function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
-    const musicStream = ytdl(server.queue[0], {highWaterMark: 25});
+    const musicStream = ytdl(server.queue[0], {highWaterMark: 1<<25}, {quality: 'highestaudio'});
     server.dispatcher = connection.playStream(musicStream);
     // Move the queue after playing the song
     console.log("current url: " + server.queue[0]);
