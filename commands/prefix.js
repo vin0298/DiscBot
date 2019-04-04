@@ -9,9 +9,10 @@ module.exports = {
 	execute(message, args) {
         var newPrefix = args[0];
         if (!prefixForServers[message.guild.id]) {
+            // Set to default prefix
             prefixForServers[message.guild.id] = prefix;
-        }
-
+        } 
+        
         if (newPrefix === prefixForServers[message.guild.id]) {
             return message.channel.reply(`New prefix suggested is the same as old prefix: ${newPrefix}`);
         } else if (newPrefix === 'default') {
@@ -19,7 +20,8 @@ module.exports = {
             return message.channel.reply(`Prefix is set to default: ${prefix}`);
         } else {
             prefixForServers[message.guild.id] = newPrefix;
-            return message.channel.reply(`Prefix set for this channel is set to ${newPrefix}`);
         }
+
+        return message.channel.reply(`Prefix set for this channel is set to ${newPrefix}`);
 	},
 };
