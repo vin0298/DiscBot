@@ -31,10 +31,14 @@ bot.once('ready', () => {
 });
 
 // simple bot command
-bot.on('message', (message) => {
+bot.on('message', async message => {
     var serverPrefix = config.prefix;
-    if (prefixForServers[message.guild.id]) {
-        serverPrefix = prefixForServers[message.guild.id];
+    try {
+        if (prefixForServers[message.guild.id]) {
+            serverPrefix = prefixForServers[message.guild.id];
+        }
+    } catch (error) {
+        console.error("Help prefix weird error bug");
     }
 
     if (!message.content.startsWith(serverPrefix) || message.author.bot) return;
