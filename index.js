@@ -34,8 +34,10 @@ bot.once('ready', () => {
 bot.on('message', async message => {
     var serverPrefix = config.prefix;
     try {
-        if (prefixForServers[message.guild.id]) {
-            serverPrefix = prefixForServers[message.guild.id];
+        if (message.guild !== undefined && message.guild !== null) {
+            if (prefixForServers[message.guild.id]) {
+                serverPrefix = prefixForServers[message.guild.id];
+            }
         }
     } catch (error) {
         console.error("Help prefix weird error bug");
