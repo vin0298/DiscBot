@@ -9,11 +9,16 @@ module.exports = {
         const helpMessageToSend = [];
         const {commands} = message.client;
 
+        let serverPrefix = prefix;
+        if (prefixForServers[message.guild.id]) {
+            serverPrefix = prefixForServers[message.guild.id];
+        }
+
         if (!args.length) {
             helpMessageToSend.push('```');
             helpMessageToSend.push('List of all available commands:\n');
             helpMessageToSend.push(commands.map(command => command.name).join(', '));
-            helpMessageToSend.push(`\nUse \`${prefix}help [command name]\` to get info on a specific command`);
+            helpMessageToSend.push(`\nUse \`${serverPrefix}help [command name]\` to get info on a specific command`);
             helpMessageToSend.push('```');
 
             // split: true - split to two messages if it's too long
@@ -31,7 +36,7 @@ module.exports = {
             const command = commands.get(commandName);
 
             if (!command) {
-	            return message.reply(`The command requested is not a valid command! Use \` ${prefix}help \` to see all available commands`);
+	            return message.reply(`The command requested is not a valid command! Use \` ${serverPrefix}help \` to see all available commands`);
             }
 
             helpMessageToSend.push('```');
@@ -42,7 +47,7 @@ module.exports = {
             }
             
             if (command.usage) {
-                helpMessageToSend.push(`Usage: ${prefix}${command.name} ${command.usage}`);
+                helpMessageToSend.push(`Usage: ${serverPrefix}${command.name} ${command.usage}`);
             }
 
             helpMessageToSend.push('Cooldown: ${command.cooldown || 3} second(s)');
