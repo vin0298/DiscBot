@@ -11,6 +11,14 @@ module.exports = {
         const voiceChannel = message.member.voiceChannel;
         voiceChannel.join()
             .then(connection => {
+                if (!musicQueueInfo[message.guild.id]) {
+                    musicQueueInfo[message.guild.id] = {queue: []};
+                }
+        
+                if (!servers[message.guild.id]) {
+                    // Check if there exist a queue
+                    servers[message.guild.id] = {queue: []};
+                }
                 message.reply("Successfully joined voice channel");
             })
 	},

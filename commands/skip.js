@@ -9,11 +9,16 @@ module.exports = {
         if (message.guild.voiceConnection) {
             // Get the queue for the current server
             var curServer = servers[message.guild.id];
+            var musicQueueServer = musicQueueInfo[message.guild.id];
             
             if (curServer.dispatcher) {
-               return curServer.dispatcher.destroy();
+                curServer.dispatcher.destroy();
+                return message.channel.send(`Skipping: **${musicQueueServer.queue[0].title}**`)
+            } 
+
+            if (!musicQueueServer.queue) {
+                return message.channel.send('No music to skip. Music queue is empty');
             }
-        
         } else {
             return message.channel.send('Bot not in a voice channel - nothing to skip');
         }

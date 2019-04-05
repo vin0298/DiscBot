@@ -4,14 +4,18 @@ const ytdl = require("ytdl-core");
 
 function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
+    var musicList = musicQueueInfo[message.guild.id];
+    // Try filter: audio
     const musicStream = ytdl(server.queue[0], {highWaterMark: 1<<25}, {quality: 'highestaudio'});
     server.dispatcher = connection.playStream(musicStream);
     // Move the queue after playing the song
     console.log("current url: " + server.queue[0]);
     server.queue.shift();
+
     console.log("Next song: " + server.queue[0]);
     server.dispatcher.on("end", function() {
         if (server.queue[0]) {
+            musicList.queue.shift();
             console.log("There's is still some music left");
             PlayMusic(connection, message);
         } else {
@@ -41,6 +45,15 @@ module.exports = {
             return message.reply(`Please just supply one argument or URL`);
         }
 
+        if (!musicQueueInfo[message.guild.id]) {
+            musicQueueInfo[message.guild.id] = {queue: []};
+        }
+
+        if (!servers[message.guild.id]) {
+            // Check if there exist a queue
+            servers[message.guild.id] = {queue: []};
+        }
+
         // Parse the link
         url = args[0];
 
@@ -48,15 +61,10 @@ module.exports = {
             if (err) {
               return message.channel.send(`Invalid URL`);
             }
-            
+            musicQueueInfo[message.guild.id].queue.push(info);
+    
             message.channel.send(`Playing: **${info.title}**`);
         })
-    
-
-        if (!servers[message.guild.id]) {
-            // Check if there exist a queue
-            servers[message.guild.id] = {queue: []};
-        }
 
         console.log("New Song Detected");
         var curServer = servers[message.guild.id];

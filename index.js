@@ -17,6 +17,7 @@ const cooldowns = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 global.servers = new Map();
+global.musicQueueInfo = new Map();
 global.prefixForServers = new Map();
 
 // Add the commands to the Collection or map
@@ -37,11 +38,10 @@ bot.on('message', async message => {
     if (message.author.bot || message.guild === null) return;
 
     var serverPrefix = config.prefix;
-    if (message.guild !== undefined && message.guild !== null) {
-        if (prefixForServers[message.guild.id]) {
-            serverPrefix = prefixForServers[message.guild.id];
-        }
+    if (prefixForServers[message.guild.id]) {
+        serverPrefix = prefixForServers[message.guild.id];
     }
+    
 
     if (!message.content.startsWith(serverPrefix)) return;
 
@@ -49,8 +49,6 @@ bot.on('message', async message => {
     const args = message.content.slice(serverPrefix.length).split(/ +/);
     // take the first element and split the rest into the args array
     const commandName = args.shift().toLowerCase();
-
-    // message.channel.send(`Command name: ${commandName}\nArguments: ${args}`);
 
     // Command not recognised
     if(!bot.commands.has(commandName)) {
