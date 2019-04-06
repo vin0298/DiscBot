@@ -6,7 +6,7 @@ function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
     var musicList = musicQueueInfo[message.guild.id];
     // Try filter: audio
-    const musicStream = ytdl(server.queue[0], {highWaterMark: 1<<25}, {quality: 'highestaudio'});
+    const musicStream = ytdl(server.queue[0], {highWaterMark: 1<<25}, {quality: 'highestaudio'}, {filter: 'audio'});
     server.dispatcher = connection.playStream(musicStream);
     // Move the queue after playing the song
     console.log("current url: " + server.queue[0]);
