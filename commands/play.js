@@ -57,10 +57,11 @@ module.exports = {
         // Parse the link
         url = args[0];
 
-        ytdl.getInfo(url, function(err, info) {
+        ytdl.getInfo(url, ['--format=bestaudio'], function(err, info) {
             if (err) {
               return message.channel.send(`Invalid URL`);
             }
+            
             musicQueueInfo[message.guild.id].queue.push(info);
     
             message.channel.send(`Playing: **${info.title}**`);
