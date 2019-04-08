@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'skip',
     description: 'Command to skip and start playing the next music',
-	execute(message) {
+	async execute(message) {
         if (!message.member.voiceChannel) {
             return message.channel.send(`You need to be in a voice channel to use this command`);
         }
@@ -13,7 +13,7 @@ module.exports = {
             
             if (curServer.dispatcher) {
                 let musicTitleSkipped = musicQueueServer.queue[0].title;
-                curServer.dispatcher.destroy();
+                await curServer.dispatcher.destroy();
                 return message.channel.send(`Skipping: **${musicTitleSkipped}**`)
             } 
 

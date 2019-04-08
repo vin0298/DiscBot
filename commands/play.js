@@ -20,6 +20,7 @@ function PlayMusic(connection, message) {
             PlayMusic(connection, message);
         } else {
             console.log("Ending");
+            musicQueueInfo[message.guild.id] = {queue: []};
             connection.disconnect();
             message.channel.send('Music ended, left voice channel');
         }
@@ -61,10 +62,21 @@ module.exports = {
             if (err) {
               return message.channel.send(`Invalid URL`);
             }
-            
             musicQueueInfo[message.guild.id].queue.push(info);
-    
             message.channel.send(`Playing: **${info.title}**`);
+
+            // if (info.partial) {
+            //     message.channel.send("Adding playist:");
+            //     for (i = 0; i < info.items.length; i++) {
+            //         servers[message.guild.id].queue.push(info.items[i].url)
+            //         musicQueueInfo[message.guild.id].queue.push(info.items[i]);
+            //     }
+            // } else {
+            //     console.log("New Song Detected");
+            //     musicQueueInfo[message.guild.id].queue.push(info);
+            //     servers[message.guild.id].queue.push(info);
+            //     message.channel.send(`Playing: **${info.title}**`);
+            // }
         })
 
         console.log("New Song Detected");
