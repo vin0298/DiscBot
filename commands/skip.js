@@ -12,7 +12,7 @@ module.exports = {
             var musicQueueServer = musicQueueInfo[message.guild.id];
             
             if (curServer.dispatcher) {
-                let musicTitleSkipped = musicQueueServer.queue[0].title;
+                let musicTitleSkipped = musicQueueServer.queue[0];
                 await curServer.dispatcher.destroy();
                 return message.channel.send(`Skipping: **${musicTitleSkipped}**`)
             } 

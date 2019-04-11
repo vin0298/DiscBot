@@ -16,9 +16,9 @@ module.exports = {
 
             let musicList = "```Music In Queue:\n";
             for (i = 0; i < musicQueueServer.queue.length; i++) {
-                musicList += `${i + 1}.${musicQueueServer.queue[i].title} `; 
+                musicList += `${i + 1}.${musicQueueServer.queue[i]} `; 
                 if (i == 0) {
-                    musicList += ' (Currently in play)';
+                    musicList += ' [Currently in play]';
                 }
                 musicList += '\n';
             }

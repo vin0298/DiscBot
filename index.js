@@ -31,9 +31,6 @@ bot.once('ready', () => {
 	console.log('Bot is Ready and Online!');
 });
 
-// simple bot command
-// HUGE PROBLEM IN DYNAMIC PREFIX
-
 bot.on('message', async message => {
     if (message.author.bot || message.guild === null) return;
 
