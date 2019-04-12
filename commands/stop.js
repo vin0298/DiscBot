@@ -7,11 +7,12 @@ module.exports = {
 	execute(message) {
         if (message.guild.voiceConnection) {
             // Empty the queue
+            servers[message.guild.id] = {queue: []};
+            musicQueueInfo[message.guild.id] = {queue: []};
+
             if (servers[message.guild.id].dispatcher) {
                 servers[message.guild.id].dispatcher.destroy();
             }
-            servers[message.guild.id] = {queue: []};
-            musicQueueInfo[message.guild.id] = {queue: []};
             
             servers.delete(message.guild.id);
             musicQueueInfo.delete(message.guild.id);

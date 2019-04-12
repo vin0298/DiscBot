@@ -27,6 +27,8 @@ for (const file of commandFiles) {
     bot.commands.set(command.name, command);
 }
 
+// ECONRESET - index.js:103:5
+
 bot.once('ready', () => {
 	console.log('Bot is Ready and Online!');
 });

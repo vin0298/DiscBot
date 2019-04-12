@@ -3,13 +3,23 @@ const ytdl = require("ytdl-core");
 const {apiKey} = require('../config.json')
 // Import googleapis client
 const {google} = require('googleapis');
+const playlistURL = 'https://www.youtube.com/playlist?list=';
+const ytVideoURL = 'https://www.youtube.com/watch?v=';
 
 function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
     var musicList = musicQueueInfo[message.guild.id];
     try {
+        // TEMP FIX
+        if (server.queue[0] === undefined){
+            console.log("Undefined url - don't go");
+            console.log(server.queue[0]);
+            return;
+        }
+        console.log("Valid URL detected - Playing music");
         const musicStream = ytdl(server.queue[0], {highWaterMark: 1<<25}, {quality: 'highestaudio'}, {filter: 'audio'});
         server.dispatcher = connection.playStream(musicStream);
+        
     } catch (error) {
         console.error(error);
         console.error("Error in playing the url");
@@ -42,46 +52,97 @@ function PlayMusic(connection, message) {
 // https://www.youtube.com/watch?v={VIDEO ID}
 // Need pageToken
 // fields: items(contentDetails/videoId,snippet(position,title)),nextPageToken
-async function GetPlayListData(playlistID, nextPageToken) {
-    console.log("Code entered");
+async function GetPlayListData(youtube, playlistID, guildId, nextPageToken) {
+    // console.log("Code entered");
     const headers = {};
+    var res = null;
     if (nextPageToken === null) {
-        const res = await youtube.playlists.list({
+        res = await youtube.playlistItems.list({
             part: 'contentDetails, snippet',
-            fields: 'items(contentDetails/videoId,snippet(position,title)),nextPageToken',
-            id: 'PLUhc5uW1a2fwanlK2Ql_bVZRsp7Q_-9HH',
+            mine: 'false',
+            playlistId: playlistID,
+            fields: 'items(contentDetails/videoId,snippet(position,title)),nextPageToken,pageInfo/resultsPerPage',
+            maxResults: 50,
             headers: headers,
         });
     } else {
-        const res = await youtube.playlists.list({
+        res = await youtube.playlistItems.list({
             part: 'contentDetails, snippet',
+            mine: 'false',
             pageToken: nextPageToken,
-            fields: 'items(contentDetails/videoId,snippet(position,title)),nextPageToken',
-            id: 'PLUhc5uW1a2fwanlK2Ql_bVZRsp7Q_-9HH',
+            playlistId: playlistID,
+            fields: 'items(contentDetails/videoId,snippet(position,title)),nextPageToken,pageInfo/resultsPerPage',
+            maxResults: 50,
             headers: headers,
         });
     } 
 
-    if (res.Status !== '200') {
+    if (parseInt(res.status) !== 200) {
         console.error("Error! Status code: " + res.status);
         console.error(res.data);
+        throw error;
+    }
+    console.log(res.data.items[0].contentDetails.videoId);
+    // int numberOfItems = parseInt(res.data.pageInfo.resultsPerPage);
+
+    // Store the results
+    for (i = 0; i < res.data.items.length; i++) {
+        console.log(i);
+        var videoID = res.data.items[i].contentDetails.videoId;
+        var videoTitle = res.data.items[i].snippet.title;
+        let ytVidURL = ytVideoURL + videoID;
+        servers[guildId].queue.push(ytVidURL);
+        console.log(ytVidURL);
+        musicQueueInfo[guildId].queue.push(videoTitle);
     }
 
-    console.log("Done");
-    console.log('Status code: ' + res.status);
-    console.log(res.data);
-    console.log("\n try to extract: \n");
-    var extractTest = res.data.items;
-    console.log(extractTest[0].contentDetails.itemCount);
+    // Check if there's still more
+    if (res.data.nextPageToken) {
+        console.log("Entered");
+        GetPlayListData(youtube, playlistID, guildId, nextPageToken);
+    }
 }
 
+function FillMusicAndPlayQueue(youtube, url, message) {
+    ytdl.getInfo(url, ['--format=bestaudio'], function(err, info) {
+        if (err) {
+            var youtubePlaylistID = url.split(playlistURL)[1];
+            try {
+                GetPlayListData(youtube, youtubePlaylistID, message.guild.id, null);
+            } catch (error) {
+                console.error("Playlist error");
+            }
+        } else {
+            console.log(err);
+            console.log("New Song Detected");
+            // Don't push info but info.title instead
+            musicQueueInfo[message.guild.id].queue.push(info.title);
+            servers[message.guild.id].queue.push(url);
+            console.log(servers[message.guild.id].queue[0]);
+            message.channel.send(url);
+            message.channel.send(`Playing: **${info.title}**`);
+        }
+
+        if (!message.guild.voiceConnection) {
+            message.member.voiceChannel.join()
+            .then(connection => {
+                console.log("Calling PlayMusic Function");
+                PlayMusic(connection, message);
+            })
+        }
+    });
+}
 
 module.exports = {
 	name: 'play',
     description: 'Command to play music. If play is used music is playing then the music being requested will be queued',
     usage: `"music-url"`,
     args: true,
-	execute(message, args) {
+	async execute(message, args) {
+        const youtube = google.youtube({
+            version: 'v3',
+            auth: apiKey
+        });
         // Check if user already join the voice channel
         if (!message.member.voiceChannel) {
             return message.channel.send(`You need to be in a voice channel`);
@@ -105,37 +166,7 @@ module.exports = {
 
         // NEED TO REFACTOR THIS
         // use a promise - review async/await/promise
-        ytdl.getInfo(url, ['--format=bestaudio'], function(err, info) {
-            if (err) {
-                // Check if it's a playlist
-                    // Later need to extract the playlist ID
-                    // sample playlist id :PLUhc5uW1a2fwanlK2Ql_bVZRsp7Q_-9HH
-
-                    // SEND REQUEST PAYLOAD
-
-                    GetPlayListData();
-                // Not a playlist so do a query
-              message.channel.send(`Invalid URL`);
-            } else {
-                console.log("New Song Detected");
-                // Don't push info but info.title instead
-                musicQueueInfo[message.guild.id].queue.push(info.title);
-                servers[message.guild.id].queue.push(info.video_url);
-                console.log(servers[message.guild.id].queue[0]);
-                message.channel.send(info.video_url);
-                message.channel.send(`Playing: **${info.title}**`);
-            }
-
-            if (!message.guild.voiceConnection) {
-                message.member.voiceChannel.join()
-               .then(connection => {
-                   message.channel.send("Successfully joined voice channel");
-                   PlayMusic(connection, message);
-               })
-           }
-        })
-
-
-
+        
+       FillMusicAndPlayQueue(youtube, url, message);
 	},
 };
