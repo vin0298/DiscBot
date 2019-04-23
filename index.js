@@ -30,7 +30,7 @@ for (const file of commandFiles) {
 // ECONRESET - index.js:103:5
 
 bot.once('ready', () => {
-	console.log('Bot is Ready and Online!');
+    console.log('Bot is Ready and Online!');
 });
 
 bot.on('message', async message => {
@@ -39,9 +39,10 @@ bot.on('message', async message => {
     var serverPrefix = config.prefix;
     if (prefixForServers[message.guild.id]) {
         serverPrefix = prefixForServers[message.guild.id];
+    } else {
+        prefixForServers[message.guild.id] = serverPrefix;
     }
     
-
     if (!message.content.startsWith(serverPrefix)) return;
 
     // take the prefix and split it
@@ -101,5 +102,7 @@ bot.on("error", error => {
     console.error(error);
     message.channel.send('```Bot encountered an error.```');
 });
+
+process.on('unhandledRejection', error => console.error('Uncaught Promise Rejection', error));
 
 bot.login(config.token);

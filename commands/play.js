@@ -5,6 +5,8 @@ const {apiKey} = require('../config.json')
 const {google} = require('googleapis');
 const playlistURL = 'https://www.youtube.com/playlist?list=';
 const ytVideoURL = 'https://www.youtube.com/watch?v=';
+const urlStart = "https://";
+const searchStrCommand = "play-choose";
 
 function PlayMusic(connection, message) {
     var server = servers[message.guild.id];
@@ -82,17 +84,13 @@ async function GetPlayListData(youtube, playlistID, guildId, nextPageToken) {
         console.error(res.data);
         throw error;
     }
-    console.log(res.data.items[0].contentDetails.videoId);
-    // int numberOfItems = parseInt(res.data.pageInfo.resultsPerPage);
 
     // Store the results
     for (i = 0; i < res.data.items.length; i++) {
-        console.log(i);
         var videoID = res.data.items[i].contentDetails.videoId;
         var videoTitle = res.data.items[i].snippet.title;
         let ytVidURL = ytVideoURL + videoID;
         servers[guildId].queue.push(ytVidURL);
-        console.log(ytVidURL);
         musicQueueInfo[guildId].queue.push(videoTitle);
     }
 
@@ -103,34 +101,134 @@ async function GetPlayListData(youtube, playlistID, guildId, nextPageToken) {
     }
 }
 
-function FillMusicAndPlayQueue(youtube, url, message) {
-    ytdl.getInfo(url, ['--format=bestaudio'], function(err, info) {
-        if (err) {
-            var youtubePlaylistID = url.split(playlistURL)[1];
-            try {
-                GetPlayListData(youtube, youtubePlaylistID, message.guild.id, null);
-            } catch (error) {
-                console.error("Playlist error");
-            }
-        } else {
-            console.log(err);
-            console.log("New Song Detected");
-            // Don't push info but info.title instead
-            musicQueueInfo[message.guild.id].queue.push(info.title);
-            servers[message.guild.id].queue.push(url);
-            console.log(servers[message.guild.id].queue[0]);
-            message.channel.send(url);
-            message.channel.send(`Playing: **${info.title}**`);
-        }
-
-        if (!message.guild.voiceConnection) {
-            message.member.voiceChannel.join()
-            .then(connection => {
-                console.log("Calling PlayMusic Function");
-                PlayMusic(connection, message);
-            })
-        }
+// Just use YTDL-GETINFO?
+async function youtubeSearch(youtube, queryString, message) {
+    var headers = {};
+    var res = null;
+    res = await youtube.search.list({
+        part: "snippet",
+        maxResults: 5,
+        order: "relevance",
+        q: queryString,
+        type: "video",
+        videoDefinition: "any",
+        fields: "items(id/videoId,snippet/title)",
+        headers: headers,
     });
+
+    if (parseInt(res.status) !== 200) {
+        console.error("Error when searching! Status code: " + res.status);
+        console.error(res.data);
+        throw error;
+    }
+
+    //console.log(res.data.items);
+
+   //  Display to the user
+    var queryTitleResults = [];
+    var queryIdResults = [];
+
+    for (i = 0; i < res.data.items.length; i++) {
+        queryTitleResults.push(res.data.items[i].snippet.title);
+        queryIdResults.push(res.data.items[i].id.videoId);
+    }
+
+    // // Wait for user's choice
+    var searchResStr = "```";
+    searchResStr += `Here are the search results. Please type in: play-choose with a number from 1 - ${res.data.items.length} as an argument to choose the selection: \n\n`;
+    for (i = 0; i < res.data.items.length; i++) {
+        searchResStr += `${i + 1}. ${queryTitleResults[i]} \n`
+        //message.channel.send(`**${i + 1}. ${queryTitleResults[i]}**`);
+    }
+    searchResStr += "```";
+
+    // Check who is the user sending the message
+    const filter = m => m.content.startsWith(searchStrCommand);
+    message.channel.send(searchResStr).then(() => {
+        message.channel.awaitMessages(filter, {max: 1, time: 10000, errors: ['time'] })
+        .then(collected => {
+            var userResponseStr = (collected.first().content).slice(searchStrCommand.length).split(/ +/)[1];
+            var userResponse = parseInt(userResponseStr);
+            if (isNaN(userResponse) || userResponse < 0 || userResponse > (res.data.items.length + 1) ) {
+                console.log(userResponse);
+                message.reply("Not a valid integer that is in range");
+                return;
+            } 
+            
+            var videoID = queryIdResults[userResponse - 1];
+            var ytVidURL = ytVideoURL + videoID;
+            servers[message.guild.id].queue.push(ytVidURL);
+            musicQueueInfo[message.guild.id].queue.push(queryTitleResults[userResponse - 1]);
+            console.log(queryTitleResults[userResponse - 1]);
+        })
+        .catch(collected => {
+            // REFACTOR THIS
+            console.log(collected);
+            console.log("A minute has passed");
+            message.reply("A minute has passed and no approriate command is entered - Try again");
+        })
+    });
+}
+
+async function queueSingleURL(url, info, message) {
+    var musicDuration = parseInt(info.length_seconds);
+    console.log(musicDuration);
+    var seconds = musicDuration % 60;
+    var minutes = ((musicDuration - seconds) / 60);
+    var musicInfoStr = info.title + " [" + minutes + "m:" + seconds + "s]";
+    console.log("New Song Detected");
+    // Don't push info but info.title instead
+    musicQueueInfo[message.guild.id].queue.push(musicInfoStr);
+    servers[message.guild.id].queue.push(url);
+    console.log(servers[message.guild.id].queue[0]);
+    message.channel.send(url);
+    message.channel.send(`Playing: **${info.title}**`);
+}
+
+function joinAndPlayMusic(message) {
+    if (!message.guild.voiceConnection) {
+        message.member.voiceChannel.join()
+        .then(connection => {
+            console.log("Calling PlayMusic Function");
+            PlayMusic(connection, message);
+        })
+    }
+}
+
+
+async function FillMusicAndPlayQueue(youtube, url, message) {
+    let command = message;
+    await ytdl.getInfo(url, ['--format=bestaudio'], function(err, info) {
+        try {
+            if (url.split(urlStart).length == 1) {
+                // make them return promises
+                youtubeSearch(youtube, url, message);
+            } else if (err) {
+                var youtubePlaylistID = url.split(playlistURL)[1];
+                GetPlayListData(youtube, youtubePlaylistID, message.guild.id, null);
+            } else {
+                // refactor this to a function
+                queueSingleURL(url, info, message);
+            }
+            // return Promise.resolve(command);
+            // return new Promise( (resolve, reject) => {
+            //     console.log("message val: " + command);
+            //     resolve(command)});
+        } catch (error) {
+            console.error("Playlist error");
+            // return new Promise( (resolve, reject, error) => {
+            //     reject(error)});
+            return Promise.reject(error);
+        }
+    })
+
+    return Promise.resolve(command);
+    // return Promise.resolve(command);
+    // .then(command => {
+    // return new Promise( (resolve, reject) => {
+    //     console.log("message val: " + command);
+    //     resolve(command)});
+    // })    
 }
 
 module.exports = {
@@ -163,10 +261,12 @@ module.exports = {
 
         // Parse the link
         url = args[0];
-
-        // NEED TO REFACTOR THIS
-        // use a promise - review async/await/promise
         
-       FillMusicAndPlayQueue(youtube, url, message);
+       FillMusicAndPlayQueue(youtube, url, message)
+       .then(command => {
+           console.log("Message: " + command);
+           joinAndPlayMusic(command)
+        })
+       .catch(error => console.error("Wrong in fillMusicAndPlay " + error));
 	},
 };
