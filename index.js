@@ -17,7 +17,7 @@ const cooldowns = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 global.servers = new Map();
-global.musicQueueInfo = new Map();
+global.songQueueGroups = new Map();
 global.prefixForServers = new Map();
 
 // Add the commands to the Collection or map

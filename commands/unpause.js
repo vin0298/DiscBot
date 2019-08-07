@@ -8,7 +8,7 @@ module.exports = {
 
         if (message.guild.voiceConnection) {
             // Get the queue for the current server
-            var curServer = servers[message.guild.id];
+            var curServer = servers.get(message.guild.id);
             if (!curServer.dispatcher) {
                 return message.channel.send('No music currently in play');
             } else {

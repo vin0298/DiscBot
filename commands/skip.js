@@ -8,16 +8,19 @@ module.exports = {
 
         if (message.guild.voiceConnection) {
             // Get the queue for the current server
-            var curServer = servers[message.guild.id];
-            var musicQueueServer = musicQueueInfo[message.guild.id];
+            var curServer = servers.get(message.guild.id);
+            var musicQueue = songQueueGroups[message.guild.id];
             
             if (curServer.dispatcher) {
-                let musicTitleSkipped = musicQueueServer.queue[0];
-                await curServer.dispatcher.destroy();
+                let musicTitleSkipped = musicQueue.queue[0].title;
+                if (curServer.dispatcher.paused) {
+                    curServer.dispatcher.resume();
+                }
+                curServer.dispatcher.end();
                 return message.channel.send(`Skipping: **${musicTitleSkipped}**`)
             } 
 
-            if (!musicQueueServer.queue) {
+            if (!musicQueue.queue) {
                 return message.channel.send('No music to skip. Music queue is empty');
             }
         } else {

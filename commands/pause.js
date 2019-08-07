@@ -1,14 +1,14 @@
 module.exports = {
 	name: 'pause',
     description: 'Command to pause the music that is currently playing',
-	execute(message) {
+	async execute(message) {
         if (!message.member.voiceChannel) {
             return message.channel.send(`You need to be in a voice channel to use this command`);
         }
 
         if (message.guild.voiceConnection) {
             // Get the queue for the current server
-            var curServer = servers[message.guild.id];
+            var curServer = servers.get(message.guild.id);
             if (!curServer.dispatcher) {
                 return message.channel.send('No music currently in play');
             } else {

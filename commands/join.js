@@ -1,3 +1,6 @@
+let serverClass = require("./Server.js");
+let Server = serverClass.Server;
+
 module.exports = {
 	name: 'join',
     description: 'Command to join a voice channel',
@@ -11,13 +14,9 @@ module.exports = {
         const voiceChannel = message.member.voiceChannel;
         voiceChannel.join()
             .then(connection => {
-                if (!musicQueueInfo[message.guild.id]) {
-                    musicQueueInfo[message.guild.id] = {queue: []};
-                }
-        
-                if (!servers[message.guild.id]) {
-                    // Check if there exist a queue
-                    servers[message.guild.id] = {queue: []};
+                if (!servers.has(message.guild.id)) {
+                    servers.set(message.guild.id, new Server(message.channel, message.member.voiceChannel));
+                    servers.get(message.guild.id).connection = connection;
                 }
                 message.reply("Successfully joined voice channel");
             })
