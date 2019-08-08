@@ -19,3 +19,4 @@ ETIMEDOUT Uncaught Promise Rejection
 bugs with pausing - cannot read property 'dispatcher' of undefined - OK
 adding song then another -> tries to stream both
 skipping is long(?)
+undefined url??? -- too long?

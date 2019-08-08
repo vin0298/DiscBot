@@ -54,25 +54,42 @@ function PlayMusic(guildId, prevTime) {
             checkAndClearTimeout(guildId);
             console.log("Playing music: " + musicQueue.queue[0].title + " with URL: " + musicQueue.queue[0].musicURL);
             const musicStream = ytdl(musicQueue.queue[0].musicURL, {highWaterMark: 1<<25}, {quality: 'highestaudio'}, {filter: 'audio'});
-            targetServer.dispatcher = targetServer.connection.playStream(musicStream);
-            servers.set(guildId, targetServer);
+            targetServer.dispatcher = targetServer.connection.playStream(musicStream)
+                    .on("end", function() {
+                        /* Shift the musicQueue */
+                        musicQueue.queue.shift();
+                        checkAndClearTimeout(guildId);
+                        if (musicQueue.queue[0]) {
+                            console.log("There's is still some music left");
+                            PlayMusic(guildId, Date.now());
+                        } else {
+                            console.log("No songs detected");
+                            targetServer.timerId = setTimeout( () => {PlayMusic(guildId, prevTime);}, 5000);
+                        }
+                    })
+                    .on("error", error => {
+                        console.error(error);
+                        targetServer.messageChannel.send("Error Occurred during playback.");
+                    });
 
-            targetServer.dispatcher.on("end", function() {
-                 /* Shift the musicQueue */
-                musicQueue.queue.shift();
-                checkAndClearTimeout(guildId);
-                if (musicQueue.queue[0]) {
-                    console.log("There's is still some music left");
-                    PlayMusic(guildId, Date.now());
-                } else {
-                    console.log("No songs detected");
-                    targetServer.timerId = setTimeout( () => {PlayMusic(guildId, prevTime);}, 5000);
-                }
-            })
-            .on("error", error => {
-                console.error(error);
-                targetServer.messageChannel.send("Error Occurred during playback.");
-            });
+            // targetServer.dispatcher.on("end", function() {
+            //      /* Shift the musicQueue */
+            //     musicQueue.queue.shift();
+            //     checkAndClearTimeout(guildId);
+            //     if (musicQueue.queue[0]) {
+            //         console.log("There's is still some music left");
+            //         PlayMusic(guildId, Date.now());
+            //     } else {
+            //         console.log("No songs detected");
+            //         targetServer.timerId = setTimeout( () => {PlayMusic(guildId, prevTime);}, 5000);
+            //     }
+            // })
+            // .on("error", error => {
+            //     console.error(error);
+            //     targetServer.messageChannel.send("Error Occurred during playback.");
+            // });
+
+            servers.set(guildId, targetServer);
         } else {
             /*  Note does not immediately stop */
             console.log("No songs timeout function call");
@@ -216,12 +233,12 @@ async function youtubeSearch(youtube, queryString, message) {
     });
 }
 
-async function queueSingleURL(url, info, message) {
+function queueSingleURL(url, info, message) {
     var musicDuration = parseInt(info.length_seconds);
-    console.log(musicDuration);
+    console.log("Music duration: " + musicDuration);
     var seconds = musicDuration % 60;
     var minutes = ((musicDuration - seconds) / 60);
-    var musicInfoStr = info.title + " [" + minutes + "m:" + seconds + "s]";
+    // var musicInfoStr = info.title + " [" + minutes + "m:" + seconds + "s]";
     console.log("New Song Detected");
     // Don't push info but info.title instead
     songQueueGroups[message.guild.id].queue.push(new Song(info.title, url));
@@ -268,6 +285,7 @@ async function FillMusicAndPlayQueue(youtube, url, message) {
                 console.log("Message inside await function: " + message);
                 queueSingleURL(url, info, message);
             }
+            joinAndPlayMusic(message);
         } catch (error) {
             console.error("Playlist error");
             return Promise.reject(error);
@@ -310,11 +328,11 @@ module.exports = {
         // Parse the link
         url = args[0];
 
-       FillMusicAndPlayQueue(youtube, url, message)
-       .then(command => {
-           joinAndPlayMusic(command);
-           console.log("Message: " + command);
-        })
-       .catch(error => console.error("Wrong in fillMusicAndPlay " + error));
+       FillMusicAndPlayQueue(youtube, url, message);
+    //    .then(command => {
+    //        joinAndPlayMusic(command);
+    //        console.log("Message: " + command);
+    //     })
+    //    .catch(error => console.error("Wrong in fillMusicAndPlay " + error));
 	},
 };
