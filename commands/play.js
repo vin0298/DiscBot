@@ -285,7 +285,7 @@ async function FillMusicAndPlayQueue(youtube, url, message) {
                 console.log("Message inside await function: " + message);
                 queueSingleURL(url, info, message);
             }
-            joinAndPlayMusic(message);
+            // joinAndPlayMusic(message);
         } catch (error) {
             console.error("Playlist error");
             return Promise.reject(error);
@@ -329,11 +329,10 @@ module.exports = {
         url = args[0];
 
        FillMusicAndPlayQueue(youtube, url, message)
-          .catch(error => console.error("Wrong in fillMusicAndPlay function " + error));
-    //    .then(command => {
-    //        joinAndPlayMusic(command);
-    //        console.log("Message: " + command);
-    //     })
-    //    .catch(error => console.error("Wrong in fillMusicAndPlay " + error));
+       .then(command => {
+           joinAndPlayMusic(command);
+           console.log("Message: " + command);
+        })
+       .catch(error => console.error("Wrong in fillMusicAndPlay " + error));
 	},
 };

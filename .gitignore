@@ -2,3 +2,6 @@ config.json
 /node_modules
 sshScript.sh
 .env
+docker_env_config.env
+stopBotContainer.sh
+runBotContainer.sh
