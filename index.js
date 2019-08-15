@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 // javascript's filesystem
 const fs = require('fs');
 // Import the constants(private)
-const config = require('./config.json');
+const config = require('./config/config.js');
 
 // creates the bot client
 const bot = new Discord.Client();
@@ -15,8 +15,6 @@ const cooldowns = new Discord.Collection();
 
 // Extract the command files and put it into an array
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
-require('dotenv').config();
 
 global.servers = new Map();
 global.songQueueGroups = new Map();
@@ -33,7 +31,6 @@ for (const file of commandFiles) {
 
 bot.once('ready', () => {
     console.log('Bot is Ready and Online!');
-    console.log(process.env);
 });
 
 bot.on('message', async message => {
@@ -108,4 +105,4 @@ bot.on("error", error => {
 
 process.on('unhandledRejection', error => console.error('Uncaught Promise Rejection', error));
 
-bot.login(config.token);
+bot.login(config.botToken);

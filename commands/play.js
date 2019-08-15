@@ -1,6 +1,6 @@
 const ytdl = require("ytdl-core");
 // Import the API Key
-const {apiKey} = require('../config.json')
+const {apiKey} = require('../config/config.js')
 // Import googleapis client
 const {google} = require('googleapis');
 const playlistURL = 'https://www.youtube.com/playlist?list=';
