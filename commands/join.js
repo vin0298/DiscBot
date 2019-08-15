@@ -1,4 +1,4 @@
-let serverClass = require("./Server.js");
+let serverClass = require("../classes/Server.js");
 let Server = serverClass.Server;
 
 module.exports = {

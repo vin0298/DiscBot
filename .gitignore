@@ -1,4 +1,4 @@
 config.json
 /node_modules
 sshScript.sh
-env_config.env
+.env
