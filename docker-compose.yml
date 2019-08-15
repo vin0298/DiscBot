@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  discord_bot:
+    image: vin0298/discord-music-bot
+    env_file: env_config.env
+    container_name: carl_discord_bot
+    ports: 
+      - "8081:80"
+networks:
+  webnet:

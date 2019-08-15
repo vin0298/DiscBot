@@ -16,6 +16,8 @@ const cooldowns = new Discord.Collection();
 // Extract the command files and put it into an array
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+require('dotenv').config();
+
 global.servers = new Map();
 global.songQueueGroups = new Map();
 global.prefixForServers = new Map();
@@ -31,6 +33,7 @@ for (const file of commandFiles) {
 
 bot.once('ready', () => {
     console.log('Bot is Ready and Online!');
+    console.log(process.env);
 });
 
 bot.on('message', async message => {

@@ -11,8 +11,8 @@ const searchStrCommand = "play-choose";
 const exitTimeLimit = 60000;
 
 /* Importing the Server and Song classes */
-let songClass = require("./Song.js");
-let serverClass = require("./Server.js");
+let songClass = require("../classes/Song.js");
+let serverClass = require("../classes/Server.js");
 let Song = songClass.Song;
 let Server = serverClass.Server;
 
@@ -328,7 +328,8 @@ module.exports = {
         // Parse the link
         url = args[0];
 
-       FillMusicAndPlayQueue(youtube, url, message);
+       FillMusicAndPlayQueue(youtube, url, message)
+          .catch(error => console.error("Wrong in fillMusicAndPlay function " + error));
     //    .then(command => {
     //        joinAndPlayMusic(command);
     //        console.log("Message: " + command);

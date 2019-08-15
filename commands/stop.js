@@ -1,5 +1,3 @@
-const {prefix} = require('../config.json');
-
 module.exports = {
 	name: 'stop',
     description: 'Use this in a voice channel as a command to stop playing music',
