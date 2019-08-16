@@ -54,7 +54,7 @@ function PlayMusic(guildId, prevTime) {
             checkAndClearTimeout(guildId);
             console.log("Playing music: " + musicQueue.queue[0].title + " with URL: " + musicQueue.queue[0].musicURL);
             const musicStream = ytdl(musicQueue.queue[0].musicURL, {highWaterMark: 1<<25}, {quality: 'highestaudio'}, {filter: 'audio'});
-            targetServer.dispatcher = targetServer.connection.playStream(musicStream)
+            targetServer.dispatcher = targetServer.connection.playStream(musicStream, {bitrate: 192000})
                     .on("end", function() {
                         /* Shift the musicQueue */
                         musicQueue.queue.shift();
@@ -71,24 +71,6 @@ function PlayMusic(guildId, prevTime) {
                         console.error(error);
                         targetServer.messageChannel.send("Error Occurred during playback.");
                     });
-
-            // targetServer.dispatcher.on("end", function() {
-            //      /* Shift the musicQueue */
-            //     musicQueue.queue.shift();
-            //     checkAndClearTimeout(guildId);
-            //     if (musicQueue.queue[0]) {
-            //         console.log("There's is still some music left");
-            //         PlayMusic(guildId, Date.now());
-            //     } else {
-            //         console.log("No songs detected");
-            //         targetServer.timerId = setTimeout( () => {PlayMusic(guildId, prevTime);}, 5000);
-            //     }
-            // })
-            // .on("error", error => {
-            //     console.error(error);
-            //     targetServer.messageChannel.send("Error Occurred during playback.");
-            // });
-
             servers.set(guildId, targetServer);
         } else {
             /*  Note does not immediately stop */

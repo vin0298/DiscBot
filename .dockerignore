@@ -3,3 +3,4 @@ docker_env_config.env
 sshScript.sh
 runBotContainer.sh
 stopBotContainer.sh
+.env
