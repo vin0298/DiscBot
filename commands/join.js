@@ -16,7 +16,8 @@ module.exports = {
             .then(connection => {
                 if (!servers.has(message.guild.id)) {
                     servers.set(message.guild.id, new Server(message.channel, message.member.voiceChannel));
-                    servers.get(message.guild.id).connection = connection;
+                    servers.get(message.guild.id).connection = connectio
+                    n;
                 }
                 message.reply("Successfully joined voice channel");
             })

@@ -10,6 +10,8 @@ const searchStrCommand = "play-choose";
 
 const exitTimeLimit = 60000;
 
+const OK_RESPONSE_CODE = 200;
+
 /* Importing the Server and Song classes */
 let songClass = require("../classes/Song.js");
 let serverClass = require("../classes/Server.js");
@@ -146,6 +148,32 @@ async function GetPlayListData(youtube, playlistID, guildId, nextPageToken) {
     }
 }
 
+// send response to youtube
+// ask user for response
+// get user's response
+// queue the said song
+// async function userQueriesYoutube(youtube, queryString, message) {
+    
+// }
+
+// function sendQueryToYouTube() {
+//     var headers = {};
+//     var response = null;
+
+//     response = await youtube.search.list({
+//         part: "snippet",
+//         maxResult: 5,
+//         order: "relevance",
+//         q: queryString,
+//         type: "video",
+//         videoDefinition: "any",
+//         fields: "items(id/videoId,snippet/title)",
+//         headers: headers,
+//     });
+
+
+// }
+
 // Just use YTDL-GETINFO?
 async function youtubeSearch(youtube, queryString, message) {
     var headers = {};
@@ -225,7 +253,6 @@ function queueSingleURL(url, info, message) {
     // Don't push info but info.title instead
     songQueueGroups[message.guild.id].queue.push(new Song(info.title, url));
 
-    message.channel.send(url);
     message.channel.send(`Playing: **${info.title}**`);
 }
 
@@ -257,6 +284,7 @@ async function FillMusicAndPlayQueue(youtube, url, message) {
         try {
             if (url.split(urlStart).length == 1) {
                 // make them return promises
+                message.channel.send('URL: ' + url[2] + ", message: " + message);
                 youtubeSearch(youtube, url, message);
             } else if (err) {
                 var youtubePlaylistID = url.split(playlistURL)[1];
@@ -292,9 +320,9 @@ module.exports = {
             return message.channel.send(`You need to be in a voice channel`);
         }
 
-        if (args.length > 1) {
-            return message.reply(`Please just supply one argument or URL`);
-        }
+        // if (args.length > 1) {
+        //     return message.reply(`Please just supply one argument or URL`);
+        // }
 
         if (!songQueueGroups[message.guild.id]) {
             songQueueGroups[message.guild.id] = {queue: []};

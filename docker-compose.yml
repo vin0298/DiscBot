@@ -2,7 +2,7 @@ version: '3'
 
 services:
   discord_bot:
-    image: vin0298/discord-music-bot
+    image: discord-music-bot
     env_file: docker_env_config.env
     container_name: carl_discord_bot
     ports: 
