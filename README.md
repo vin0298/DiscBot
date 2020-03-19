@@ -19,3 +19,5 @@ Note: This bot is currently deployed on a DigitalOcean droplet (Might change in 
 2. Use this link and add the bot to the server you want to add it to: https://discordapp.com/oauth2/authorize?client_id=431272942588919808&scope=bot&permissions=0
 3. Enjoy and please report any bugs on github!
 
+19 March 2020 - Currently fixing a major bug that might involves the YTDL-CORE library.
+
